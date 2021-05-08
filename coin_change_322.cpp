@@ -61,12 +61,12 @@ public:
 };
 
 
-class SolutionDP {
+class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
         // from bottom
         if (amount < 1) return 0;
-        vector<int> dp(amount + 1, 0); // work from bottom, doesn't care init value
+        vector<int> dp(amount + 1, amount + 1); // do care the init value
         dp[0] = 0;
         for (int i = 1; i <= amount; i++)
         {
@@ -77,17 +77,12 @@ public:
                 if (remaining == 0) ans = 1;
                 if (remaining < 0 ) continue;
                 int tmpAns = 1 + dp[remaining];
-                if (tmpAns == 0) // can't fit
-                    continue;
-                if (tmpAns < ans)
-                    ans = tmpAns;
+                if (dp[i] > tmpAns)
+                    dp[i] = tmpAns;
             }
-            if (ans == i+1)
-                dp[i] = -1;
-            else
-                dp[i] = ans;
         }
+        if (dp[amount] == amount + 1)
+            return -1;
         return dp[amount];
     }
-
 };
