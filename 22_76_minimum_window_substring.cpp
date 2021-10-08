@@ -196,3 +196,60 @@ public:
             return "";
     }
 };
+
+// One time KO
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        vector<int> dict(128, 0);
+        for (char c : t)
+        {
+            dict[c]++;
+        }
+        int count = t.size();
+        int left = 0;
+        int ansStart = 0;
+        int ansSize = s.size() + 1;
+        for (int i = 0; i < s.size(); i++)
+        {
+            char c = s[i];
+            // move right pointer
+            dict[c]--; // need to make it 0, can go negative
+            // but if go negative, don't decrease count
+            if (dict[c] >= 0 /*&& count*/)
+            {
+                count--;
+                if (count == 0)
+                {
+                    // all t found
+                    // ready to move left pointer
+                    while (1)
+                    {
+                        char cc = s[left];
+                        dict[cc]++;
+                        // go above 0 means we skip the key one.
+                        // go back to 0 could be just non-key
+                        // if still negative?
+                        // t = AB
+                        // s = A C A C B C A A B
+                        if (dict[cc] > 0)
+                        {
+                            count++;
+                            if (i - left + 1 < ansSize)
+                            {
+                                ansStart = left;
+                                ansSize = i - left + 1;
+                            }
+                            // record the state, could move pointer to find new
+                            left++;
+                            break;
+                        }
+                        // move to find boundray
+                        left++;
+                    }
+                }
+            }
+        }
+        return ansSize == s.size() + 1 ? "" : s.substr(ansStart, ansSize);
+    }
+};
