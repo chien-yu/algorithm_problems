@@ -1,3 +1,4 @@
+// This timeout
 class SolutionRecursive {
 public:
     map<int, int> dp; // store f(x) = y in (x,y)
@@ -60,7 +61,7 @@ public:
     }
 };
 
-
+// PASSED
 class Solution {
 public:
     int coinChange(vector<int>& coins, int amount) {
@@ -86,3 +87,97 @@ public:
         return dp[amount];
     }
 };
+
+// timeout
+class Solution {
+public:
+    Solution() :
+        ans(0)
+    {}
+    map<int, int> dp;
+    int coinChange(vector<int>& coins, int amount) {
+        if (amount == 0)
+            return 0;
+        if (find(coins.begin(), coins.end(), amount) != coins.end())
+        {
+            return 1;
+        }
+        if (dp[amount] != 0)
+            return dp[amount];
+        
+        int min = amount + 1;
+        for (int c : coins)
+        {
+            if (c < amount)
+            {
+                int tmp = coinChange(coins, amount - c);
+                if (tmp != -1 && tmp < min)
+                    min = tmp;
+            }
+        }
+        if (min == amount + 1)
+            return -1;
+
+        dp[amount] = min + 1;
+        return dp[amount];
+    }
+};
+
+
+// genuis
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        vector<long> dp(amount + 1, INT_MAX);
+        dp[0] = 0;
+
+        for(auto i : coins)
+            for(int j = i; j <= amount; j++)
+                dp[j] = min(dp[j], 1 + dp[j - i]);
+
+        return dp[amount] == INT_MAX ? -1 : dp[amount];
+    }
+};
+
+
+// a terrible one
+//         if (amount == 0)
+//             return 0;
+//         for (int i = 0; i < coins.size(); i++)
+//         {
+//             int c = coins[i];
+            
+//         }
+//         find(coins, amount, 0);
+//         if (ans == 0)
+//             return -1;
+//         return ans;
+//     }
+
+//     int find(vector<int>& coins, int target, int layer)
+//     {
+//         for (int c : coins)
+//         {
+//             if (c == target)
+//             {
+//                 if (ans == 0)
+//                 {
+//                     ans = layer + 1;
+//                 }
+//                 if (layer + 1 < ans)
+//                 {
+//                     ans = layer + 1;
+//                 }
+//                 return layer;
+//             }
+//             if (target > c)
+//             {
+//                 find(coins, target - c, layer + 1);
+//             }
+//             else
+//             {
+//                 return -1;
+//             }
+//         }
+//         return -1;
+//     }
