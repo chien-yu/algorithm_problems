@@ -61,3 +61,30 @@ public:
         return *max_element(dp.begin(), dp.end());
     }
 };
+
+// First time one time pass
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        // the dp vector is the longest array from index 0 to i
+        vector<int> dp(nums.size(), 1);
+        // dp[i] needs to loop through index 0 to i-1, to find
+        // any entry smaller than itself to update dp[i].
+        // dp[0] must be 1.
+        int ans = 1;
+        for (int i = 1; i < nums.size(); i++)
+        {
+            // update dp[i], need loop
+            for (int j = 0; j < i; j++)
+            {
+                if (nums[j] < nums[i])
+                {
+                    dp[i] = max(dp[j] + 1, dp[i]);
+                    ans = max(ans, dp[i]);
+                }
+            }
+        }
+        
+        return ans;
+    }
+};
