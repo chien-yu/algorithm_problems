@@ -48,3 +48,34 @@ public:
         return ans;
     }
 };
+
+// 2/3/22
+class Solution {
+public:
+    int characterReplacement(string s, int k) {
+        int i = 0;
+        int j = 0;
+        int maxSize = 0;
+        int ans = 0;
+        map<char, int> m;
+        for (; j < s.size(); j++)
+        {
+            char c = s[j];
+            m[c]++;
+            maxSize = max(maxSize, m[c]);
+            while (maxSize + k < j - i + 1 && j >= i)
+            {
+                // size is too large
+                m[s[i]]--;
+                i++;
+                // int tmpMax = 0;
+                for (auto p : m)
+                {
+                    maxSize = max(p.second, maxSize);
+                }
+            }
+            ans = max(ans, j-i+1);
+        }
+        return ans;
+    }
+};
