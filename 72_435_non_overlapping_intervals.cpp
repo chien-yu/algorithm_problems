@@ -30,3 +30,42 @@ public:
         return ans;
     }
 };
+
+// 2/12/22
+// quick
+class Solution {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end(), [](auto& v1, auto& v2){
+            return v1[0] < v2[0];
+        });
+        
+        // case 1:
+        //   |------|
+        //    |----|  earlier
+        // case 2:
+        //   |------|
+        //    |--------| later
+        int currentEnd = intervals[0][1];
+        int numRemove = 0;
+        for (int i = 1; i < intervals.size(); i++)
+        {
+            auto& itv = intervals[i];
+            if (itv[0] < currentEnd)
+            {
+                // overlap, must take out 1
+                numRemove++;
+                if (currentEnd > itv[1])
+                {
+                    // use the new interval
+                    currentEnd = itv[1];
+                }
+            }
+            else
+            {
+                currentEnd = itv[1];
+            }
+        }
+        return numRemove;
+    }
+};

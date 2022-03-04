@@ -253,3 +253,116 @@ public:
         return ansSize == s.size() + 1 ? "" : s.substr(ansStart, ansSize);
     }
 };
+
+
+// okay okay
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        
+        if (s.size() == 1)
+        {
+            return s == t ? s : "";
+        }
+        // still 2 pointers
+        // first pointer on any first match
+        // then go until we find all match
+        // how to move the left pointer?
+        // move to any place that has match
+        //
+        // ADOBEC
+        // then move left to
+        //    BEC       -> invalid
+        // then move right
+        //    BECODEBA
+        //      CODEBA  -> valid
+        //          BA
+        //          BANC
+        // basically you stop on every key char
+        map<char, int> dic;
+        set<char> setOfS;
+        for (char c : t)
+        {
+            dic[c]++;
+            setOfS.insert(c);
+        }
+        // dic represents the number we need to find.
+        // set s is to check if it is key char
+        int left = 0;
+        int m = s.size();
+        // first find all key char
+        int right = left;
+        int n = t.size();
+        int nMatch = 0;
+        int minLength = m + 1;
+        int ansStart = 0;
+        for (; right < m; right++)
+        {
+            if (setOfS.count(s[right]))
+            {
+                if (dic[s[right]] > 0)
+                {
+                    dic[s[right]]--;
+                    nMatch++;
+                }
+                else// if (dic[s[right]] <= 0)
+                {
+                    dic[s[right]]--;
+                    // extra match
+                    // t = ABBC
+                    // s = A B B B B C
+                    //           ^ we don't count match anymore
+                }
+            }
+            // what happen if we see it twice?
+            // A B B B D D D D
+            // we should mark 2nd and 3rd B differently?
+            // since we just need 1B, we should know we
+            // can move to 3rd B if we move left pointer.
+            //   ^1 -> 0
+            //     ^0 -> -1
+            //       ^-1 -> -2
+            // when move left
+            //   ^-2 -> -1
+            //     ^-1 -> 0
+            //       ^0 -> 1, stop when it becomes positive
+            // this works when we have 2B
+            if (nMatch == n)
+            {
+                // all found, need to move left
+                for (; left <= right; left++)
+                {
+                    // t = ABC
+                    // s = D A B C D A
+                    if (setOfS.count(s[left]))
+                    {
+                        if (dic[s[left]] < 0)
+                        {
+                            dic[s[left]]++;
+                            // continue
+                        }
+                        else if (dic[s[left]] == 0)
+                        {
+                            // t = ABBC
+                            // s = A B B B B C
+                            //     ^ should decrease nMatch to find next A
+                            //           ^ should decrease to find next B
+                            nMatch--;
+                            dic[s[left]]++;
+                            if (right - left + 1 < minLength)
+                            {
+                                minLength = right - left + 1;
+                                ansStart = left;
+                            }
+                            left++;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (minLength == m+1)
+            return "";
+        return s.substr(ansStart, minLength);
+    }
+};
