@@ -47,3 +47,41 @@ public:
         }
     }
 };
+
+// old
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        vector<vector<int>> ans;
+        if (nums.size()  < 3)
+            return ans;
+        
+        sort(nums.begin(),nums.end());
+        for (int i = 0; i < nums.size()-2; i++)
+        {
+            if (i > 0 && nums[i] == nums[i-1])
+                continue;
+            int target = nums[i];
+            // 2Sum with target
+            int front = i+1;
+            int end = nums.size()-1;
+            while (front < end)
+            {
+                if (nums[front] + nums[end] + target == 0)
+                {
+                    // got it
+                    vector<int> a = {target, nums[front], nums[end]};
+                    ans.push_back(a);
+                    while (front < end && nums[front] == nums[++front]) continue;
+                    while (front < end && nums[end] == nums[--end]) continue;
+                }
+                else if (nums[front] + nums[end] + target > 0)
+                    end--;
+                else
+                    front++;
+            }
+        }
+        return ans;
+    }
+};
+
