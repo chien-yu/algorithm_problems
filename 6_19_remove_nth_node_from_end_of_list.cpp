@@ -57,6 +57,48 @@ public:
     }
 };
 
+class Solution2 {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        // we can just run 2 pointers at the same time
+        // 1->2->3->4->5
+        //       ^ connect
+        //             ^ connectTo
+        //             ^ n
+        //
+        // if n =4
+        // 1->2->3->4->5
+        // ^ connect
+        //       ^ connectTo
+        //             ^ end
+        // so connect and end diff by n
+        if (n == 0)
+            return head;
+        ListNode* dummy = new ListNode(0, head);
+        ListNode* ptr1 = dummy;
+        ListNode* ptr2 = dummy;
+        // d->1->2
+        // if n = 2
+        // return 2, we need to connect d->2, and return d->next
+        for (int i = 0; ptr2 && i < n; i++)
+        {
+            ptr2 = ptr2->next;
+        }
+        if (ptr2 == nullptr)
+        {
+            // n is too large
+            return head;
+        }
+        while (ptr2 && ptr2->next)
+        {
+            ptr1 = ptr1->next;
+            ptr2 = ptr2->next;
+        }
+        ptr1->next = ptr1->next->next;
+        return dummy->next;
+    }
+};
+
 using namespace std;
 
 int main()
@@ -72,7 +114,7 @@ int main()
     ptr->next = new ListNode(5);
     ptr = ptr->next;
 
-    Solution s;
+    Solution2 s;
     s.removeNthFromEnd(head, 2);
 
     ptr = head;
