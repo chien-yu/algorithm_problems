@@ -1,9 +1,18 @@
+/*
+
+In-degree is useful when you don't know where is the "root"
+
+*/
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include <list>
 #include <unordered_map>
 #include <cassert>
 #include <random>
+#include <queue>
+#include <stack>
 
 using namespace std;
 
@@ -31,8 +40,6 @@ W = 1 << 3
 #define Dir_NW Dir_N | Dir_W
 #define Dir_SW Dir_S | Dir_W
 
-// #define LOG()
-
 struct Entry
 {
     int p1;
@@ -48,16 +55,16 @@ private:
     // p2
     void addNS(int p1, int p2)
     {
-        graphNS[p1][p2] = 1;
+        graphNS[p1].push_back(p2);
     }
 
     // p2 -> p1
     void addEW(int p1, int p2)
     {
-        graphEW[p1][p2] = 1;
+        graphEW[p1].push_back(p2);;
     }
 
-    int bfs(int N, int cur, vector<int>& visited, vector<vector<int>>& graph)
+    int bfs(int N, int cur, vector<int>& visited, vector<list<int>>& graph)
     {
         if (visited[cur] == 2)
             return 0;
@@ -70,9 +77,10 @@ private:
         visited[cur] = 1;
         progress.push_back(cur);
         // go child first
-        for (int i = 0; i < N; i++)
+        for (int i : graph[cur])
+        // for (int i = 0; i < N; i++)
         {
-            if (graph[cur][i]) // has child
+            // if (graph[cur][i]) // has child
             {
                 if (1 == bfs(N, i, visited, graph))
                 {
@@ -85,10 +93,8 @@ private:
         return 0;
     }
 
-    int process(int N, vector<vector<int>>& graph)
+    int process(int N, vector<list<int>>& graph)
     {
-        // turns all points into graph in 2D array
-
         // 0: not yet visit
         // 1: visiting
         // 2: visited
@@ -105,22 +111,70 @@ private:
             // if B->C, B->D
             // we need to finish C and D first
             // it is like BFS
-            
             // recursive
             if (1 == bfs(N, i, visited, graph))
             {
                 return 1;
             }
-
-            // iterative
-            // for ()
-
         }
         return 0;
     }
 
-    vector<vector<int>> graphNS;
-    vector<vector<int>> graphEW;
+    int processIter(int N, vector<list<int>>& graph)
+    {
+        // number of incoming
+        vector<int> inDegree(N,0);
+        for (int i = 0; i < N; i++)
+        {
+            // graph[i] -> u
+            for (int u : graph[i])
+            {
+                inDegree[u]++;
+            }
+        }
+
+        // only DAG must have in degree 0 vertex
+        // otherwise there is loop
+        queue<int> q;
+        for (int i = 0; i < N; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                q.push(i);
+            }
+        }
+
+        int count = 0;
+        // 1 --> 2
+        //       2 --> 3
+        //   --------> 3
+        // if we starts from 1, we will see 2 and 3
+        // goal is to find loop only
+        // we just search 2 and 3, but remember we are searching them
+        // q.push(i);
+        while (q.size())
+        {
+            int cur = q.front();
+            // don't need to remember the node
+            q.pop();
+            // who point to here?
+            for (int u : graph[cur])
+            {
+                inDegree[u]--;
+                if (inDegree[u] == 0)
+                    q.push(u);
+            }
+            count++;
+            // we can't finish here, the other node might come back as a loop
+            // we need to keep visiting the stack/queue, we need to know when do all children finish...
+        }
+        return !(count == N);
+    }
+
+    // vector<vector<int>> graphNS;
+    // vector<vector<int>> graphEW;
+    vector<list<int>> graphNS;
+    vector<list<int>> graphEW;
 
     // logging
     vector<int> progress;
@@ -142,12 +196,13 @@ public:
         }
         cout << endl;
     }
-    bool check(vector<Entry>& data, int N) {
+
+    void build(vector<Entry>& data, int N) {
         // we need to process in 2 direction N-S and E-W
         // each direction put into a directed graph to check cycle
 
-        graphNS.resize(N, vector<int>(N));
-        graphEW.resize(N, vector<int>(N));
+        graphNS.resize(N, list<int>());
+        graphEW.resize(N, list<int>());
 
         for (Entry e : data)
         {
@@ -206,8 +261,19 @@ public:
             }
 */
         }
+    }
 
+    bool check(vector<Entry>& data, int N) {
+        build(data, N);
         if (process(N, graphNS) || process(N, graphEW))
+            return 1;
+        else
+            return 0;
+    }
+
+    bool checkIter(vector<Entry>& data, int N) {
+        build(data, N);
+        if (processIter(N, graphNS) || processIter(N, graphEW))
             return 1;
         else
             return 0;
@@ -244,7 +310,8 @@ int main() {
     }
 
     int result = s1.check(data, N);
-    cout << "result: " << result << endl;
+    int r2 = s1.checkIter(data, N);
+    cout << "result: " << result << " " << r2 << endl;
     if (result)
      s1.printProgress();
 
