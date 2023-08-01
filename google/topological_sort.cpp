@@ -1,6 +1,12 @@
 /*
 
-In-degree is useful when you don't know where is the "root"
+In-degree is useful when you don't know where is the "root" (0 in-degree)
+
+If we recursive in dfs, we need to try all nodes
+
+why iterative we need to determine the "root" first?
+because if I start from a vertex which is not 0 in-degree, how can I wait all the children to be process first?
+can I just keep adding children to a stack/queue, and marked visited on the way? seems impossible.
 
 */
 
@@ -64,7 +70,7 @@ private:
         graphEW[p1].push_back(p2);;
     }
 
-    int bfs(int N, int cur, vector<int>& visited, vector<list<int>>& graph)
+    int dfs(int N, int cur, vector<int>& visited, vector<list<int>>& graph)
     {
         if (visited[cur] == 2)
             return 0;
@@ -82,7 +88,7 @@ private:
         {
             // if (graph[cur][i]) // has child
             {
-                if (1 == bfs(N, i, visited, graph))
+                if (1 == dfs(N, i, visited, graph))
                 {
                     return 1;
                 }
@@ -112,7 +118,7 @@ private:
             // we need to finish C and D first
             // it is like BFS
             // recursive
-            if (1 == bfs(N, i, visited, graph))
+            if (1 == dfs(N, i, visited, graph))
             {
                 return 1;
             }
