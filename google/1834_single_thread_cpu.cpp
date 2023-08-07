@@ -4,6 +4,86 @@
 
 using namespace std;
 
+// bug fix on clear condition
+class Solution {
+public:
+    vector<int> getOrder(vector<vector<int>>& tasks) {
+        auto f = [](auto& p1, auto& p2){
+            if (p1.first == p2.first)
+                return p1.second > p2.second;
+            return p1.first > p2.first;
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(f)> pqReady(f);
+        // we need to put all due tasks into pq
+
+        auto f2 = [](auto& p1, auto& p2){
+            if (p1.first == p2.first)
+                return p1.second > p2.second;
+            return p1.first > p2.first;
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(f2)> pqEnqueue(f2);
+        for (int i = 0; i < tasks.size(); i++)
+        {
+            int enqueueTime = tasks[i][0];
+            pqEnqueue.push(make_pair(enqueueTime, i));
+        }
+
+        vector<int> ans;
+
+        // define init cond
+        long long lastFinishedTime = 0;
+
+        while (pqEnqueue.size() || pqReady.size())
+        {
+            // prepare ready task
+            int nextEnqueueTime = pqEnqueue.top().first;
+            int taskIdx =  pqEnqueue.top().second;
+            // empty next q and time pass 
+            if (lastFinishedTime <= nextEnqueueTime && pqReady.empty())
+            {
+                lastFinishedTime = nextEnqueueTime;
+            }
+
+            while (pqEnqueue.size() && pqEnqueue.top().first <= lastFinishedTime)
+            {
+                nextEnqueueTime = pqEnqueue.top().first;
+                taskIdx =  pqEnqueue.top().second;
+                // add ready tasks
+                if (nextEnqueueTime <= lastFinishedTime)
+                {
+                    // key is processingTime
+                    pqReady.push(make_pair(tasks[taskIdx][1], taskIdx));
+                    pqEnqueue.pop();
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // process
+            int nextTaskIdx = pqReady.top().second;
+            ans.push_back(nextTaskIdx);
+            auto& task = tasks[nextTaskIdx];
+            // new timing
+            // |-----[   ]
+            if (lastFinishedTime <= task[0])
+            {
+                lastFinishedTime = (long long)task[0] + task[1];
+            }
+
+            else
+            {
+                lastFinishedTime += task[1];
+
+            }
+            
+            pqReady.pop();
+        }
+        return ans;
+    }
+};
+
 // 15 / 39 testcases passed
 class Solution {
 public:
