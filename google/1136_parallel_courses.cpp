@@ -5,6 +5,197 @@
 
 using namespace std;
 
+// bfs passed
+class Solution {
+public:
+    int minimumSemesters(int n, vector<vector<int>>& relations) {
+        // build a directed graph and in-degree
+        // since we want to start from the "root"
+        vector<set<int>> graph(n, set<int>());
+        vector<int> inDegree(n, 0);
+        for (auto& relation : relations)
+        {
+            int pre = relation[0] - 1;
+            int next = relation[1] - 1;
+            graph[pre].insert(next);
+            inDegree[next]++;
+        }
+
+        // find all 0 degree
+        vector<int> zeroDegrees;
+        for (int i = 0; i < n; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                zeroDegrees.push_back(i);
+            }
+        }
+
+        if (zeroDegrees.size() == 0)
+        {
+            return -1;
+        }
+
+        int ans = 0;
+
+        // try bfs, so queue
+        queue<int> q;
+        for (int i : zeroDegrees)
+        {
+            q.push(i);
+            // we need to use the inDegree to help
+            // when inDegree back to 0, then we finish all pre
+        }
+        set<int> studied;
+        int steps = 0;
+        queue<int> subQ;
+        while(q.size())
+        {
+            // when finish all these q, we will finish all level 1
+            int node = q.front();
+            q.pop();
+
+            // can finished study and assign next level
+            // if (inDegree[node] == 0)
+            {
+                studied.insert(node);
+                for (int next : graph[node])
+                {
+                    // we can also -- later when we pop()?
+                    // but it will be hard to initial 0-degree nodes
+                    inDegree[next]--;
+                    if (inDegree[next] == 0)
+                        subQ.push(next);
+                }
+            }
+
+            if (q.size() == 0)
+            {
+                steps++;
+                q = subQ;
+                queue<int> tmpQ;
+                subQ = tmpQ;
+            }
+            else
+            {
+                cout << "q size left " << q.size() << endl;
+            }
+        }
+
+        if (studied.size() != n)
+            return -1;
+        return steps;
+    }
+};
+
+// try bfs again, but 19 / 39 testcases passed
+/*
+class Solution {
+public:
+    int minimumSemesters(int n, vector<vector<int>>& relations) {
+        // build a directed graph and in-degree
+        // since we want to start from the "root"
+        vector<set<int>> graph(n, set<int>());
+        vector<int> inDegree(n, 0);
+        for (auto& relation : relations)
+        {
+            int pre = relation[0] - 1;
+            int next = relation[1] - 1;
+            graph[pre].insert(next);
+            inDegree[next]++;
+        }
+
+        // find all 0 degree
+        vector<int> zeroDegrees;
+        for (int i = 0; i < n; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                zeroDegrees.push_back(i);
+            }
+        }
+
+        if (zeroDegrees.size() == 0)
+        {
+            return -1;
+        }
+
+        int ans = 0;
+
+        // try bfs, so queue
+        queue<int> q;
+        for (int i : zeroDegrees)
+        {
+            q.push(i);
+            // we need to use the inDegree to help
+            // when inDegree back to 0, then we finish all pre
+        }
+        set<int> studied;
+        int steps = 0;
+        queue<int> subQ;
+        while(q.size())
+        {
+            // when finish all these q, we will finish all level 1
+            int node = q.front();
+            q.pop();
+
+            // can finished study and assign next level
+            if (inDegree[node] == 0)
+            {
+                studied.insert(node);
+                for (int next : graph[node])
+                {
+                    subQ.push(next);
+                    // we can also -- later when we pop()?
+                    // but it will be hard to initial 0-degree nodes
+                    inDegree[next]--;
+                }
+            }
+
+            if (q.size() == 0)
+            {
+                steps++;
+                q = subQ;
+                queue<int> tmpQ;
+                subQ = tmpQ;
+            }
+        }
+
+        if (studied.size() != n)
+            return -1;
+        return steps;
+    }
+};
+*/
+
+// try bfs
+/*
+        for (int i : zeroDegrees)
+        {
+            queue<pair<int, int>> q;    
+            set<int> visited;
+            // we need another level variable to go along with the iteration, just like
+            // recursive we have level.
+
+            // why queue can only push from back and pop from front? limited feature, or implmentation limit?
+            q.push(make_pair(i, 1));
+            whlie(q.size())
+            {
+                int level = q.front().second;
+                int node = q.front().first;
+                q.pop();
+                for (int next : graph[node])
+                {
+                    // we only need to go unvisited node
+                    // how to detect cycle? visits a visited node not always cycle
+                    // basically we can't know if a node is finished
+                    if ()
+                }
+            }
+
+            ans = max(ans, level);
+        }
+*/
 
 // passed
 class Solution {
