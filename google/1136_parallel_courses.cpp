@@ -6,6 +6,80 @@
 using namespace std;
 
 
+// passed
+class Solution {
+public:
+    int dfs(int node , vector<int>& visited, vector<set<int>>& graph)
+    {
+        // needs to return the level, if not child, then it is 1;
+        int level = 1;
+        if (visited[node] == -1)
+            return -1;
+        if (visited[node] > 0)
+        {
+            // if this is visited, I still need to report
+            // but how to find out the level result here?
+            // we can use the visited?
+            return visited[node];
+        }
+        visited[node] = -1; // visiting
+
+        for (int next : graph[node])
+        {
+            int res = dfs(next, visited, graph);
+            if (res == -1)
+                return -1;
+            level = max(res + 1, level);
+        }
+
+        // store the level here for other coming route to quick get result
+        visited[node] = level;
+        return level;
+    }
+    int minimumSemesters(int n, vector<vector<int>>& relations) {
+        // build a directed graph and in-degree
+        // since we want to start from the "root"
+        vector<set<int>> graph(n, set<int>());
+        vector<int> inDegree(n, 0);
+        for (auto& relation : relations)
+        {
+            int pre = relation[0] - 1;
+            int next = relation[1] - 1;
+            graph[pre].insert(next);
+            inDegree[next]++;
+        }
+
+        // find all 0 degree
+        vector<int> zeroDegrees;
+        for (int i = 0; i < n; i++)
+        {
+            if (inDegree[i] == 0)
+            {
+                zeroDegrees.push_back(i);
+            }
+        }
+
+        if (zeroDegrees.size() == 0)
+        {
+            return -1;
+        }
+
+        int ans = 0;
+
+        // since we want to travel in dfs, store them in stack.
+        // how to count the level?
+        for (int i : zeroDegrees)
+        {
+            vector<int> visited(n, 0);
+            int level = dfs(i, visited, graph);
+            if (level == -1)
+                return -1;
+            ans = max(ans, level);
+        }
+        return ans;
+    }
+};
+
 // 4 / 39 testcases passed
 class Solution {
 public:
